@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>生日快乐 ❤️</title>
+<style>
+html, body{
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+button{
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;background:#07050f;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+  color:#fff;-webkit-user-select:none;user-select:none;-webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 背景星空 ---------- */
+#stars{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 0%,#241a44 0%,#120d26 42%,#07050f 100%);
+}
+#stars i{position:absolute;border-radius:50%;background:#fff;animation:twinkle linear infinite;}
+@keyframes twinkle{0%,100%{opacity:.12;transform:scale(.7)}50%{opacity:.85;transform:scale(1.15)}}
+
+#app{position:fixed;inset:0;z-index:1;}
+
+/* ---------- 场景 ---------- */
+.scene{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;
+  padding:calc(24px + env(safe-area-inset-top)) 20px calc(24px + env(safe-area-inset-bottom));
+  overflow-y:auto;-webkit-overflow-scrolling:touch;
+  opacity:0;pointer-events:none;transition:opacity .7s ease;
+}
+.scene.active{opacity:1;pointer-events:auto;}
+.wrap{
+  margin:auto;width:100%;max-width:400px;
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;text-align:center;
+}
+
+/* ---------- 通用按钮 ---------- */
+.btn-main{
+  margin-top:14px;padding:14px 46px;border:none;border-radius:999px;
+  font-size:17px;font-weight:600;color:#fff;font-family:inherit;
+  background:linear-gradient(135deg,#ff6b9d,#ff8fb1 60%,#ffb3c9);
+  box-shadow:0 8px 30px rgba(255,107,157,.45);
+  animation:btnPulse 2.2s ease-in-out infinite;
+}
+.btn-main:active{transform:scale(.95);}
+@keyframes btnPulse{
+  0%,100%{box-shadow:0 8px 26px rgba(255,107,157,.32);}
+  50%{box-shadow:0 10px 44px rgba(255,107,157,.75);}
+}
+.next-btn{
+  margin-top:16px;padding:12px 38px;border-radius:999px;border:none;
+  font-size:15px;font-weight:600;color:#fff;font-family:inherit;
+  background:linear-gradient(135deg,rgba(255,107,157,.95),rgba(255,143,177,.95));
+  box-shadow:0 8px 24px rgba(255,107,157,.35);
+  visibility:hidden;opacity:0;transform:translateY(10px);
+  transition:all .5s cubic-bezier(.2,.9,.3,1);
+}
+.next-btn.show{visibility:visible;opacity:1;transform:translateY(0);}
+.next-btn:active{transform:scale(.95);}
+
+/* ---------- 开场 ---------- */
+.cover-heart{font-size:66px;animation:pulse 2.2s ease-in-out infinite;}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+.cover-title{
+  font-size:40px;font-weight:700;letter-spacing:8px;text-indent:8px;
+  background:linear-gradient(135deg,#ffd6e8,#ff8ab8,#ffd88a);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.cover-sub{font-size:15px;color:rgba(255,255,255,.68);letter-spacing:4px;}
+.cover-hint{font-size:12px;color:rgba(255,255,255,.35);margin-top:4px;}
+
+/* ---------- 抖音评论区 ---------- */
+.dy-phone{
+  width:100%;max-width:340px;height:min(66vh,510px);
+  background:#17181f;border-radius:20px;
+  border:1px solid rgba(255,255,255,.08);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 22px 60px rgba(0,0,0,.65);
+}
+.dy-head{
+  padding:12px 14px;font-size:13px;color:rgba(255,255,255,.55);
+  border-bottom:1px solid rgba(255,255,255,.06);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.dy-video{padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.06);text-align:left;}
+.dy-video-title{font-size:13px;font-weight:600;line-height:1.5;}
+.dy-video-tag{font-size:11px;color:#fe2c55;margin-top:5px;}
+.dy-list{flex:1;overflow-y:auto;padding:12px 14px 18px;text-align:left;}
+.dy-list::-webkit-scrollbar{display:none;}
+.dy-cmt{
+  display:flex;gap:9px;margin-bottom:14px;
+  opacity:0;transform:translateY(10px);animation:cmtIn .5s forwards;
+}
+@keyframes cmtIn{to{opacity:1;transform:translateY(0)}}
+.dy-av{
+  width:30px;height:30px;flex:0 0 30px;border-radius:50%;
+  background:#2b2c38;display:flex;align-items:center;justify-content:center;font-size:16px;
+}
+.dy-body{flex:1;min-width:0;}
+.dy-name{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:3px;}
+.dy-txt{font-size:13px;line-height:1.55;color:rgba(255,255,255,.9);}
+.dy-cmt.you .dy-txt{color:#ffd6e8;}
+
+.like-float{display:flex;flex-direction:column;align-items:center;gap:8px;margin:10px 0 4px;}
+.like-btn{
+  width:54px;height:54px;border-radius:50%;border:none;font-size:23px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#fe2c55,#ff6b9d);
+  box-shadow:0 6px 22px rgba(254,44,85,.55);
+  animation:btnPulse 1.6s infinite;transition:.3s;
+}
+.like-btn:active{transform:scale(.9);}
+.like-tip{font-size:11px;color:rgba(255,255,255,.42);}
+
+/* ---------- 微信聊天 ---------- */
+.chat-box{
+  width:100%;max-width:340px;height:min(66vh,510px);
+  background:rgba(255,255,255,.045);border-radius:20px;
+  border:1px solid rgba(255,255,255,.09);
+  display:flex;flex-direction:column;overflow:hidden;
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+}
+.chat-head{
+  padding:12px;text-align:center;font-size:13px;color:rgba(255,255,255,.6);
+  border-bottom:1px solid rgba(255,255,255,.06);
+}
+.chat-body{
+  flex:1;overflow-y:auto;padding:14px 12px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.chat-body::-webkit-scrollbar{display:none;}
+.msg{
+  max-width:78%;padding:9px 13px;border-radius:15px;
+  font-size:13.5px;line-height:1.55;word-break:break-word;
+  opacity:0;transform:translateY(8px);animation:cmtIn .4s forwards;
+}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#ff6b9d,#ff8fb1);border-bottom-right-radius:4px;}
+.msg.you{align-self:flex-start;background:rgba(255,255,255,.11);border-bottom-left-radius:4px;}
+.typing{
+  align-self:flex-start;background:rgba(255,255,255,.11);
+  padding:12px 15px;border-radius:15px;display:flex;gap:4px;
+}
+.typing span{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);animation:dot 1.2s infinite;}
+.typing span:nth-child(2){animation-delay:.2s}
+.typing span:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,60%,100%{opacity:.3;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+
+.choice-box{
+  margin-top:10px;padding:14px;border-radius:16px;
+  background:rgba(255,107,157,.1);
+  border:1px dashed rgba(255,107,157,.5);
+  animation:cmtIn .5s forwards;text-align:center;
+}
+.choice-title{font-size:12px;color:rgba(255,255,255,.55);line-height:1.6;}
+.choice-q{font-size:15px;margin:10px 0 14px;color:#ffd6e8;font-weight:600;}
+.choice-btns{display:flex;gap:10px;}
+.choice-btn{
+  flex:1;padding:11px 6px;border-radius:12px;font-family:inherit;
+  border:1px solid rgba(255,255,255,.16);
+  background:rgba(255,255,255,.06);color:#fff;font-size:13px;transition:.25s;
+}
+.choice-btn.primary{
+  background:linear-gradient(135deg,#ff6b9d,#ff8fb1);
+  border-color:transparent;font-weight:600;
+}
+.choice-btn:active{transform:scale(.95);}
+.shake{animation:shake .4s;}
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-6px)}
+  40%{transform:translateX(6px)}
+  60%{transform:translateX(-4px)}
+  80%{transform:translateX(4px)}
+}
+
+/* ---------- 通用标题 ---------- */
+.scene-title{
+  font-size:22px;font-weight:700;letter-spacing:3px;
+  background:linear-gradient(135deg,#ffd6e8,#ff8ab8);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+}
+.scene-sub{font-size:12.5px;color:rgba(255,255,255,.45);line-height:1.7;}
+
+/* ---------- 缘分星星 ---------- */
+.star-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;margin-top:6px;}
+.star-item{
+  padding:16px 8px;border-radius:16px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.09);
+  display:flex;flex-direction:column;align-items:center;gap:7px;
+  transition:.35s;
+}
+.star-item:active{transform:scale(.96);}
+.star-item .ico{font-size:24px;filter:grayscale(1);opacity:.32;transition:.35s;}
+.star-item .txt{font-size:12px;color:rgba(255,255,255,.4);transition:.35s;}
+.star-item.on{
+  background:rgba(255,107,157,.13);
+  border-color:rgba(255,107,157,.5);
+  box-shadow:0 0 26px rgba(255,107,157,.25);
+}
+.star-item.on .ico{filter:none;opacity:1;transform:scale(1.18);}
+.star-item.on .txt{color:#ffd6e8;}
+
+.meter{
+  width:100%;height:8px;border-radius:99px;
+  background:rgba(255,255,255,.08);overflow:hidden;margin-top:4px;
+}
+.meter-fill{
+  height:100%;width:0;border-radius:99px;
+  background:linear-gradient(90deg,#ff6b9d,#ffd88a);
+  transition:width .6s cubic-bezier(.2,.9,.3,1);
+  box-shadow:0 0 14px rgba(255,107,157,.7);
+}
+.meter-num{font-size:24px;font-weight:700;color:#ffd6e8;letter-spacing:1px;}
+
+/* ---------- 两颗心融合 ---------- */
+.merge-stage{
+  position:relative;height:170px;width:100%;
+  display:flex;align-items:center;justify-content:center;
+}
+.h-left,.h-right{position:absolute;font-size:46px;}
+.h-left{animation:mL 1.5s cubic-bezier(.4,0,.2,1) forwards;}
+.h-right{animation:mR 1.5s cubic-bezier(.4,0,.2,1) forwards;}
+@keyframes mL{
+  0%{transform:translateX(-92px) scale(1);opacity:1}
+  75%{opacity:1}
+  100%{transform:translateX(0) scale(.35);opacity:0}
+}
+@keyframes mR{
+  0%{transform:translateX(92px) scale(1);opacity:1}
+  75%{opacity:1}
+  100%{transform:translateX(0) scale(.35);opacity:0}
+}
+.h-merge{font-size:74px;opacity:0;animation:popIn .9s 1.1s forwards;}
+@keyframes popIn{
+  0%{opacity:0;transform:scale(.2)}
+  60%{opacity:1;transform:scale(1.3)}
+  100%{opacity:1;transform:scale(1)}
+}
+.merge-text{
+  font-size:15px;line-height:2;color:rgba(255,255,255,.85);
+  opacity:0;transform:translateY(12px);transition:.9s;
+}
+.merge-text.show{opacity:1;transform:translateY(0);}
+
+/* ---------- 生日蛋糕 ---------- */
+.cake-wrap{position:relative;width:220px;height:240px;margin-top:8px;}
+.cake-plate{
+  position:absolute;left:-16px;right:-16px;bottom:0;height:18px;border-radius:50%;
+  background:linear-gradient(180deg,#3d3260,#241c3d);
+  box-shadow:0 12px 34px rgba(0,0,0,.6);
+}
+.cake-body{
+  position:absolute;left:26px;right:26px;bottom:12px;height:112px;
+  border-radius:12px 12px 20px 20px;
+  background:linear-gradient(180deg,
+    #ffe9f3 0%,#ffe9f3 15%,
+    #ffb3d1 15%,#ffb3d1 47%,
+    #ff9ec5 47%,#ff9ec5 52%,
+    #ffb3d1 52%,#ff8ab8 100%);
+  box-shadow:inset 0 -8px 20px rgba(0,0,0,.18), 0 8px 24px rgba(255,107,157,.25);
+}
+.cake-body::after{
+  content:"";position:absolute;left:0;right:0;top:14%;height:12px;
+  background:radial-gradient(circle at 10px 6px,#ffe9f3 6px,transparent 7px) repeat-x;
+  background-size:20px 12px;
+}
+.candle{
+  position:absolute;bottom:124px;width:11px;height:46px;border-radius:5px;
+  background:linear-gradient(180deg,#ffffff,#ffd6e6);
+  box-shadow:0 0 10px rgba(255,214,230,.4);
+  transition:.3s;
+}
+.candle:nth-child(1){left:66px;}
+.candle:nth-child(2){left:104px;}
+.candle:nth-child(3){left:142px;}
+.flame{
+  position:absolute;left:50%;bottom:100%;width:13px;height:20px;
+  margin-left:-6.5px;
+  border-radius:50% 50% 50% 50%/62% 62% 38% 38%;
+  background:radial-gradient(circle at 50% 72%,#fffbd0,#ffd34d 45%,#ff8a00 82%);
+  box-shadow:0 0 20px rgba(255,180,60,.95),0 0 40px rgba(255,140,0,.45);
+  animation:flicker .34s ease-in-out infinite alternate;
+  transform-origin:bottom center;transition:.35s;
+}
+@keyframes flicker{
+  from{transform:scale(1) rotate(-3deg);}
+  to{transform:scale(1.12) rotate(3deg);}
+}
+.candle.out .flame{opacity:0;transform:scale(.15);}
+.smoke{
+  position:absolute;left:50%;bottom:100%;width:7px;height:7px;
+  margin-left:-3.5px;border-radius:50%;background:rgba(255,255,255,.55);
+  animation:smokeUp 1.6s ease-out forwards;
+}
+@keyframes smokeUp{
+  0%{opacity:.85;transform:translateY(0) scale(.5)}
+  100%{opacity:0;transform:translateY(-58px) scale(2.6)}
+}
+.cake-text{
+  font-size:16px;line-height:1.9;color:#ffd6e8;
+  opacity:0;transform:translateY(10px);transition:.8s;
+}
+.cake-text.show{opacity:1;transform:translateY(0);}
+
+/* ---------- 情书 ---------- */
+.letter{
+  width:100%;padding:24px 20px;border-radius:20px;text-align:left;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
+.letter p{
+  font-size:13.5px;line-height:2;color:rgba(255,255,255,.82);
+  opacity:0;transform:translateY(8px);
+  transition:opacity .8s ease,transform .8s ease;
+  min-height:0;
+}
+.letter p.show{opacity:1;transform:translateY(0);}
+.letter p.gap{height:10px;}
+
+/* ---------- 特效 ---------- */
+.fly-heart{
+  position:fixed;z-index:9999;pointer-events:none;
+  animation:flyUp linear forwards;
+}
+@keyframes flyUp{
+  0%{opacity:1;transform:translate(0,0) scale(.5);}
+  100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4);}
+}
+.fall-heart{
+  position:fixed;top:-60px;z-index:9998;pointer-events:none;
+  animation:fallDown linear forwards;
+}
+@keyframes fallDown{
+  0%{opacity:0;transform:translateY(0) rotate(0deg);}
+  10%{opacity:1;}
+  100%{opacity:0;transform:translateY(108vh) rotate(400deg);}
+}
+
+/* ---------- 音乐按钮 ---------- */
+.music-btn{
+  position:fixed;z-index:999;
+  top:calc(12px + env(safe-area-inset-top));right:14px;
+  width:38px;height:38px;border-radius:50%;
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(255,255,255,.08);color:#fff;font-size:17px;
+  backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  transition:.3s;
+}
+.music-btn.off{opacity:.35;}
+</style>
+</head>
+<body>
+
+<div id="stars"></div>
+
+<button id="musicBtn" class="music-btn">♪</button>
+
+<div id="app">
+
+  <!-- ========== 场景 0：封面 ========== -->
+  <section class="scene active" id="s0">
+    <div class="wrap">
+      <div class="cover-heart">🎂</div>
+      <h1 class="cover-title">生日快乐</h1>
+      <p class="cover-sub">致我最爱的你</p>
+      <p class="cover-hint">请戴上耳机，调大音量 ♪</p>
+      <button class="btn-main" id="startBtn">开启惊喜</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 1：抖音评论区 ========== -->
+  <section class="scene" id="s1">
+    <div class="wrap">
+      <div class="dy-phone">
+        <div class="dy-head"><span>← 评论区</span><span>1286 条评论</span></div>
+        <div class="dy-video">
+          <div class="dy-video-title">🔥 深夜放毒 | 这家的糖醋排骨，一口封神</div>
+          <div class="dy-video-tag">#美食 #深夜食堂 #城市美食地图</div>
+        </div>
+        <div class="dy-list" id="dyList"></div>
+      </div>
+      <button class="next-btn" id="s1Next">继续 →</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 2：聊天 ========== -->
+  <section class="scene" id="s2">
+    <div class="wrap">
+      <div class="chat-box">
+        <div class="chat-head">她 · 在线</div>
+        <div class="chat-body" id="chatBody"></div>
+      </div>
+      <button class="next-btn" id="s2Next">继续 →</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 3：缘分值 ========== -->
+  <section class="scene" id="s3">
+    <div class="wrap">
+      <h2 class="scene-title">我们的缘分值</h2>
+      <p class="scene-sub" id="s3Hint">点亮四颗星星，看看我们有多合拍</p>
+      <div class="star-grid" id="starGrid"></div>
+      <div class="meter"><div class="meter-fill" id="meterFill"></div></div>
+      <div class="meter-num" id="meterNum">0%</div>
+      <button class="next-btn" id="s3Next">继续 →</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 4：在一起 ========== -->
+  <section class="scene" id="s4">
+    <div class="wrap">
+      <div class="merge-stage">
+        <div class="h-left">💙</div>
+        <div class="h-right">💙</div>
+        <div class="h-merge">💗</div>
+      </div>
+      <p class="merge-text" id="s4Text">
+        从那天起，两个城市之间，<br>多了一条只有我们知道的路线。
+      </p>
+      <button class="next-btn" id="s4Next">继续 →</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 5：生日蛋糕 ========== -->
+  <section class="scene" id="s5">
+    <div class="wrap">
+      <h2 class="scene-title">许个愿吧</h2>
+      <p class="scene-sub" id="s5Hint">点一下蜡烛，把它吹灭</p>
+      <div class="cake-wrap">
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+        <div class="candle"><div class="flame"></div></div>
+        <div class="cake-body"></div>
+        <div class="cake-plate"></div>
+      </div>
+      <p class="cake-text" id="s5Text">生日快乐，我的女孩 ❤️</p>
+      <button class="next-btn" id="s5Next">还有话想对你说 →</button>
+    </div>
+  </section>
+
+  <!-- ========== 场景 6：情书 ========== -->
+  <section class="scene" id="s6">
+    <div class="wrap">
+      <div class="letter" id="letterBox"></div>
+      <button class="next-btn" id="s6Next">最后一下 →</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+
+/* ==================== 基础工具 ==================== */
+var $ = function(s){ return document.querySelector(s); };
+function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+function rand(a,b){ return a + Math.random()*(b-a); }
+
+function tap(el, fn){
+  if(!el) return;
+  var lock = false;
+  var sx = 0, sy = 0, moved = false;
+
+  function fire(e){
+    if(lock) return;
+    lock = true;
+    setTimeout(function(){ lock = false; }, 300);
+    fn(e);
+  }
+
+  el.addEventListener('touchstart', function(e){
+    var t = e.touches[0];
+    sx = t.clientX; sy = t.clientY; moved = false;
+  }, {passive:true});
+
+  el.addEventListener('touchmove', function(e){
+    var t = e.touches[0];
+    if(Math.abs(t.clientX - sx) > 10 || Math.abs(t.clientY - sy) > 10){
+      moved = true;
+    }
+  }, {passive:true});
+
+  el.addEventListener('touchend', function(e){
+    if(moved) return;
+    e.preventDefault();
+    fire(e);
+  }, {passive:false});
+
+  el.addEventListener('click', function(e){
+    fire(e);
+  });
+}
+function buzz(ms){
+  if(navigator.vibrate){ try{ navigator.vibrate(ms); }catch(e){} }
+}
+
+/* ==================== 星空背景 ==================== */
+(function(){
+  var box = document.getElementById('stars');
+  var html = '';
+  for(var i=0;i<80;i++){
+    var size = rand(1,2.6).toFixed(1);
+    html += '<i style="left:'+rand(0,100).toFixed(1)+'%;top:'+rand(0,100).toFixed(1)+
+            '%;width:'+size+'px;height:'+size+'px;animation-duration:'+rand(2,6).toFixed(1)+
+            's;animation-delay:-'+rand(0,5).toFixed(1)+'s"></i>';
+  }
+  box.innerHTML = html;
+})();
+
+/* ==================== 场景管理 ==================== */
+var current = 's0';
+var hooks = {};
+
+function goTo(id){
+  if(id === current) return;
+  var cur = document.getElementById(current);
+  var nx = document.getElementById(id);
+  if(cur) cur.classList.remove('active');
+  if(nx) nx.classList.add('active');
+  current = id;
+  if(hooks[id]){
+    setTimeout(function(){
+      try{ hooks[id](); }
+      catch(err){ console.error('hook error:', err); }
+    }, 260);
+  }
+}
+
+/* ==================== 爱心特效 ==================== */
+var EMOJI = ['❤️','💖','💕','💗','💘','✨','🌸','💞'];
+
+function burstHearts(cx, cy, n){
+  for(var i=0;i<n;i++){
+    (function(){
+      var h = document.createElement('div');
+      h.className = 'fly-heart';
+      h.textContent = EMOJI[Math.floor(Math.random()*EMOJI.length)];
+      h.style.left = cx + 'px';
+      h.style.top  = cy + 'px';
+      h.style.fontSize = rand(14,30).toFixed(0) + 'px';
+      h.style.setProperty('--dx', rand(-150,150).toFixed(0) + 'px');
+      h.style.setProperty('--dy', (-rand(120,330)).toFixed(0) + 'px');
+      h.style.animationDuration = rand(1.2,2.1).toFixed(2) + 's';
+      document.body.appendChild(h);
+      setTimeout(function(){ h.remove(); }, 2300);
+    })();
+  }
+}
+
+function heartRain(duration){
+  duration = duration || 4000;
+  var timer = setInterval(function(){
+    var h = document.createElement('div');
+    h.className = 'fall-heart';
+    h.textContent = EMOJI[Math.floor(Math.random()*EMOJI.length)];
+    h.style.left = rand(0,100).toFixed(1) + 'vw';
+    h.style.fontSize = rand(16,34).toFixed(0) + 'px';
+    h.style.animationDuration = rand(3,6).toFixed(1) + 's';
+    document.body.appendChild(h);
+    setTimeout(function(){ h.remove(); }, 7000);
+  }, 150);
+  setTimeout(function(){ clearInterval(timer); }, duration);
+}
+
+/* ==================== 音乐（Web Audio） ==================== */
+var actx = null, musicOn = false, musicTimer = null;
+
+function ensureAudio(){
+  if(!actx){
+    try{
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) actx = new AC();
+    }catch(e){ actx = null; }
+  }
+  if(actx && actx.state === 'suspended'){ actx.resume(); }
+  return actx;
+}
+
+function note(freq, when, dur, vol){
+  if(!actx) return;
+  var o = actx.createOscillator();
+  var g = actx.createGain();
+  o.type = 'sine';
+  o.frequency.value = freq;
+  g.gain.setValueAtTime(0, when);
+  g.gain.linearRampToValueAtTime(vol, when + 0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+  o.connect(g);
+  g.connect(actx.destination);
+  o.start(when);
+  o.stop(when + dur + 0.05);
+}
+
+var MELODY = [
+  [523.25,0],   [659.25,0.4], [783.99,0.8], [659.25,1.2],
+  [587.33,1.6], [698.46,2.0], [880.00,2.4], [698.46,2.8],
+  [493.88,3.2], [587.33,3.6], [783.99,4.0], [587.33,4.4],
+  [523.25,4.8], [659.25,5.2], [783.99,5.6], [1046.50,6.0],
+  [987.77,6.6], [783.99,7.2], [659.25,7.6]
+];
+
+function loopMusic(){
+  if(!musicOn || !actx) return;
+  var now = actx.currentTime + 0.06;
+  for(var i=0;i<MELODY.length;i++){
+    note(MELODY[i][0], now + MELODY[i][1], 1.2, 0.042);
+  }
+  note(130.81, now, 4.4, 0.032);
+  note(146.83, now + 4.4, 4.4, 0.032);
+  musicTimer = setTimeout(loopMusic, 8800);
+}
+
+function startMusic(){
+  if(!ensureAudio()) return;
+  if(musicOn) return;
+  musicOn = true;
+  $('#musicBtn').classList.remove('off');
+  loopMusic();
+}
+
+function stopMusic(){
+  musicOn = false;
+  if(musicTimer){ clearTimeout(musicTimer); musicTimer = null; }
+  $('#musicBtn').classList.add('off');
+}
+
+tap($('#musicBtn'), function(){
+  if(musicOn){ stopMusic(); }
+  else { startMusic(); }
+});
+
+/* ==================== 场景 0 → 1 ==================== */
+tap($('#startBtn'), function(){
+  buzz(20);
+  ensureAudio();
+  startMusic();
+  goTo('s1');
+});
+
+/* ==================== 场景 1：抖音评论区 ==================== */
+var COMMENTS = [
+  {av:'🧑🏻‍💻', name:'我', text:'糖醋排骨还是得看火候，这家的糖色挂得漂亮', me:true},
+  {av:'👧🏻', name:'她', text:'我吃过更好吃的！那家藏在巷子里，老板只做晚上那几小时', me:false},
+  {av:'🧑🏻‍💻', name:'我', text:'求地址！我愿意为它跨城飞奔 🏃', me:true},
+  {av:'👧🏻', name:'她', text:'那你可得跑快点哦 😏', me:false},
+  {av:'🧑🏻‍💻', name:'我', text:'已出发。顺便问一句——跑到了，能请你一起吃吗？', me:true}
+];
+
+var s1Done = false;
+
+hooks.s1 = function(){
+  if(s1Done) return;
+  s1Done = true;
+  runScene1();
+};
+
+async function runScene1(){
+  var list = $('#dyList');
+  list.innerHTML = '';
+
+  for(var i=0;i<COMMENTS.length;i++){
+    await sleep(i === 0 ? 600 : 1300);
+    var c = COMMENTS[i];
+    var el = document.createElement('div');
+    el.className = 'dy-cmt ' + (c.me ? 'me' : 'you');
+    el.innerHTML =
+      '<div class="dy-av">' + c.av + '</div>' +
+      '<div class="dy-body">' +
+        '<div class="dy-name">' + c.name + '</div>' +
+        '<div class="dy-txt">' + c.text + '</div>' +
+      '</div>';
+    list.appendChild(el);
+    list.scrollTop = list.scrollHeight;
+    buzz(8);
+  }
+
+  await sleep(900);
+
+  var likeWrap = document.createElement('div');
+  likeWrap.className = 'like-float';
+  likeWrap.innerHTML =
+    '<button class="like-btn" id="likeBtn">👍</button>' +
+    '<div class="like-tip">点一下，我们的故事就开始了</div>';
+  list.appendChild(likeWrap);
+  list.scrollTop = list.scrollHeight;
+
+  tap($('#likeBtn'), function(){
+    var btn = $('#likeBtn');
+    var r = btn.getBoundingClientRect();
+    burstHearts(r.left + r.width/2, r.top + r.height/2, 20);
+    buzz(30);
+    btn.style.animation = 'none';
+    btn.style.background = '#fe2c55';
+    btn.style.transform = 'scale(1.15)';
+    btn.textContent = '❤️';
+    setTimeout(function(){
+      $('#s1Next').classList.add('show');
+    }, 900);
+  });
+}
+
+tap($('#s1Next'), function(){ buzz(15); goTo('s2'); });
+
+/* ==================== 场景 2：聊天 ==================== */
+var CHAT = [
+  {who:'me',  text:'你那边下雨了吗'},
+  {who:'you', text:'刚下完，现在有点凉'},
+  {who:'me',  text:'那记得加件衣服'},
+  {who:'me',  text:'对了，你昨天说的那家店，我去吃了'},
+  {who:'you', text:'啊？你真去啦 😳'},
+  {who:'me',  text:'嗯。真的好吃，就是一个人吃有点怪'},
+  {who:'you', text:'哈哈哈 下次带上我呀'},
+  {who:'me',  text:'好啊'},
+  {who:'me',  text:'说起来…我们好像才认识两三天'},
+  {who:'you', text:'嗯？怎么突然这么说'},
+  {who:'me',  text:'但感觉像认识了很久很久'},
+  {who:'you', text:'……我也是'}
+];
+
+var s2Done = false;
+
+hooks.s2 = function(){
+  if(s2Done) return;
+  s2Done = true;
+  runScene2();
+};
+
+async function runScene2(){
+  var body = $('#chatBody');
+  body.innerHTML = '';
+
+  for(var i=0;i<CHAT.length;i++){
+    var m = CHAT[i];
+
+    if(m.who === 'you'){
+      await sleep(450);
+      var t = document.createElement('div');
+      t.className = 'typing';
+      t.innerHTML = '<span></span><span></span><span></span>';
+      body.appendChild(t);
+      body.scrollTop = body.scrollHeight;
+      await sleep(1000);
+      t.remove();
+    } else {
+      await sleep(680);
+    }
+
+    var el = document.createElement('div');
+    el.className = 'msg ' + m.who;
+    el.textContent = m.text;
+    body.appendChild(el);
+    body.scrollTop = body.scrollHeight;
+    buzz(6);
+  }
+
+  await sleep(800);
+  showChoice();
+}
+
+function showChoice(){
+  var body = $('#chatBody');
+  var box = document.createElement('div');
+  box.className = 'choice-box';
+  box.innerHTML =
+    '<div class="choice-title">那天晚上，我打了一行字又删掉，<br>最后按下发送的是——</div>' +
+    '<div class="choice-q">"我们……要不要试试看？"</div>' +
+    '<div class="choice-btns">' +
+      '<button class="choice-btn primary" id="btnYes">好呀 ❤️</button>' +
+      '<button class="choice-btn" id="btnNo">让我想想…</button>' +
+    '</div>';
+  body.appendChild(box);
+  body.scrollTop = body.scrollHeight;
+
+  var noLock = false;
+
+  tap($('#btnYes'), function(){
+    buzz(30);
+    box.remove();
+    chooseYes();
+  });
+
+  tap($('#btnNo'), function(){
+    if(noLock) return;
+    noLock = true;
+    var b = $('#btnNo');
+    b.classList.add('shake');
+    buzz(20);
+    setTimeout(function(){
+      b.textContent = '这个选项被我删掉啦 😌';
+      b.style.opacity = '.55';
+    }, 420);
+    setTimeout(function(){
+      box.remove();
+      chooseYes();
+    }, 1500);
+  });
+}
+
+function chooseYes(){
+  var body = $('#chatBody');
+  var el = document.createElement('div');
+  el.className = 'msg you';
+  el.textContent = '好呀 ❤️';
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+
+  burstHearts(window.innerWidth/2, window.innerHeight*0.55, 26);
+  heartRain(1200);
+
+  setTimeout(function(){
+    $('#s2Next').classList.add('show');
+  }, 1000);
+}
+
+tap($('#s2Next'), function(){ buzz(15); goTo('s3'); });
+
+/* ==================== 场景 3：缘分值 ==================== */
+var TRAITS = [
+  {ico:'🌶️', txt:'都爱吃辣'},
+  {ico:'🌙', txt:'都爱深夜点外卖'},
+  {ico:'💬', txt:'都爱在评论区瞎聊'},
+  {ico:'🎬', txt:'连喜欢的剧都一样'}
+];
+
+var s3Done = false, litCount = 0;
+
+hooks.s3 = function(){
+  if(s3Done) return;
+  s3Done = true;
+  buildStars();
+};
+
+function buildStars(){
+  var grid = $('#starGrid');
+  grid.innerHTML = '';
+  litCount = 0;
+
+  TRAITS.forEach(function(t){
+    var d = document.createElement('div');
+    d.className = 'star-item';
+    d.innerHTML = '<div class="ico">' + t.ico + '</div><div class="txt">' + t.txt + '</div>';
+
+    tap(d, function(){
+      if(d.classList.contains('on')) return;
+      d.classList.add('on');
+      litCount++;
+      buzz(12);
+      var r = d.getBoundingClientRect();
+      burstHearts(r.left + r.width/2, r.top + r.height/2, 6);
+      updateMeter();
+    });
+
+    grid.appendChild(d);
+  });
+
+  updateMeter();
+}
+
+function updateMeter(){
+  var pct = litCount / TRAITS.length * 100;
+  $('#meterFill').style.width = pct + '%';
+  $('#meterNum').textContent = Math.round(pct) + '%';
+
+  if(litCount === TRAITS.length){
+    setTimeout(function(){
+      $('#s3Hint').textContent = '缘分不是巧合，是我蓄谋已久的靠近。';
+      $('#s3Next').classList.add('show');
+      heartRain(2200);
+      buzz(40);
+    }, 450);
+  }
+}
+
+tap($('#s3Next'), function(){ buzz(15); goTo('s4'); });
+
+/* ==================== 场景 4：在一起 ==================== */
+hooks.s4 = function(){
+  heartRain(1200);
+  setTimeout(function(){ $('#s4Text').classList.add('show'); }, 1700);
+  setTimeout(function(){
+    $('#s4Next').classList.add('show');
+    buzz(30);
+  }, 2600);
+};
+
+tap($('#s4Next'), function(){ buzz(15); goTo('s5'); });
+
+/* ==================== 场景 5：蛋糕 ==================== */
+var s5Done = false, candlesOut = 0;
+
+hooks.s5 = function(){
+  if(s5Done) return;
+  s5Done = true;
+  candlesOut = 0;
+
+  var candles = document.querySelectorAll('.candle');
+  for(var i=0;i<candles.length;i++){
+    (function(c){
+      c.classList.remove('out');
+      tap(c, function(){
+        if(c.classList.contains('out')) return;
+        c.classList.add('out');
+        candlesOut++;
+        buzz(18);
+
+        var s = document.createElement('div');
+        s.className = 'smoke';
+        c.appendChild(s);
+        setTimeout(function(){ s.remove(); }, 1700);
+
+        if(candlesOut === candles.length){
+          setTimeout(function(){
+            heartRain(5200);
+            burstHearts(window.innerWidth/2, window.innerHeight*0.42, 30);
+            $('#s5Hint').textContent = '愿望已经收到啦 ✨';
+            $('#s5Text').classList.add('show');
+            $('#s5Next').classList.add('show');
+            buzz([30,60,30]);
+          }, 700);
+        }
+      });
+    })(candles[i]);
+  }
+};
+
+tap($('#s5Next'), function(){ buzz(15); goTo('s6'); });
+
+/* ==================== 场景 6：情书 ==================== */
+var LETTER = [
+  '遇见你之前，我以为"缘分"只是电视剧里的台词。',
+  '直到那天，在一条关于糖醋排骨的视频下面，',
+  '我们因为"哪家更好吃"争论了起来。',
+  '',
+  '后来我才明白，',
+  '不是那家店有多好吃，',
+  '是和你聊天的那两三天，',
+  '让这个世界突然变得温柔了。',
+  '',
+  '现在我们隔着很远的距离。',
+  '但没关系，',
+  '我会把每一个想你的夜晚，',
+  '都好好存起来，',
+  '等见面那天，一次性还给你。',
+  '',
+  '生日快乐，我的女孩。',
+  '愿你今年许下的所有愿望，',
+  '都能实现——',
+  '包括那个关于我的。'
+];
+
+var s6Done = false;
+
+hooks.s6 = function(){
+  if(s6Done) return;
+  s6Done = true;
+  runScene6();
+};
+
+async function runScene6(){
+  var box = $('#letterBox');
+  box.innerHTML = '';
+
+  var nodes = LETTER.map(function(line){
+    var p = document.createElement('p');
+    if(line === ''){ p.className = 'gap'; }
+    else { p.textContent = line; }
+    box.appendChild(p);
+    return p;
+  });
+
+  for(var i=0;i<nodes.length;i++){
+    await sleep(LETTER[i] === '' ? 160 : 420);
+    nodes[i].classList.add('show');
+    if(i % 3 === 0) buzz(4);
+  }
+
+  await sleep(600);
+  $('#s6Next').classList.add('show');
+  heartRain(2500);
+}
+
+tap($('#s6Next'), function(){
+  buzz([20,50,20]);
+  heartRain(9000);
+  burstHearts(window.innerWidth/2, window.innerHeight*0.5, 40);
+
+  var btn = $('#s6Next');
+  btn.textContent = '我爱你 ❤️';
+  btn.disabled = true;
+
+  setTimeout(function(){
+    var tip = document.createElement('p');
+    tip.style.cssText =
+      'margin-top:14px;font-size:14px;letter-spacing:2px;color:#ffd6e8;' +
+      'opacity:0;transition:1s;line-height:2;';
+    tip.innerHTML = '记得关掉手机，去照照镜子——<br>屏幕里这个，是我最喜欢的人。';
+    btn.parentNode.appendChild(tip);
+    setTimeout(function(){ tip.style.opacity = '1'; }, 60);
+  }, 900);
+});
+
+/* ==================== 页面回到前台时恢复音频 ==================== */
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && musicOn && actx && actx.state === 'suspended'){
+    actx.resume();
+  }
+});
+
+})();
+</script>
+</body>
+</html>
